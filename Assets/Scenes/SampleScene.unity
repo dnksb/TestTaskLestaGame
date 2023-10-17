@@ -6823,7 +6823,7 @@ CapsuleCollider:
   m_Radius: 1.01
   m_Height: 4.23
   m_Direction: 1
-  m_Center: {x: 0, y: 2.08, z: 0}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!114 &434361237 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114902363545381412, guid: e0e1165640516fb4abe42fbb6339664f, type: 3}
