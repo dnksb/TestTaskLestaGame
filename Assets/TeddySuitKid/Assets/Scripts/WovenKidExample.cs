@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,6 +15,13 @@ public class WovenKidExample : MonoBehaviour {
 	public Transform camera; 
     float smoothVelocity;
     public float smothTime;
+	
+	int health;
+	public Text healthText;
+	
+	public Vector3 startPosition;
+	public GameObject loseMenu;
+	public GameObject winMenu;
 
 	// Use this for initialization
 	void Start () {
@@ -22,13 +30,19 @@ public class WovenKidExample : MonoBehaviour {
 		Run = Animator.StringToHash("Run");
 		Celebrates = Animator.StringToHash("Celebrates");
 		FallSitted = Animator.StringToHash("FallSitted");
+		
+		transform.position = startPosition;
+		health = 100;
+		healthText.text = $"{health}/100";
+
+		Cursor.visible = true;
+        Screen.lockCursor = true;
 	}
 
 	// Update is called once per frame
 	void Update () {
 		float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        Debug.Log(horizontal);
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
 
 		if (direction.magnitude == 0f)
@@ -55,5 +69,39 @@ public class WovenKidExample : MonoBehaviour {
 
             controller.position += (move.normalized * Force * Time.deltaTime);
         }
+	}
+
+	public void OnTriggerEnter(Collider other)
+	{
+		if(other.tag == "fire")
+		{
+			health -= 20;
+			healthText.text = $"{health}/100";
+			if(health <= 0)
+			{
+				loseMenu.SetActive(true);
+				Cursor.visible = false;
+				Screen.lockCursor = false;
+				healthText.text = $"{health}/100";
+			}
+		}
+		else if(other.tag == "finish")
+		{
+			winMenu.SetActive(true);
+		}
+	}
+
+	public void Respawn()
+	{
+		loseMenu.SetActive(false);
+		winMenu.SetActive(false);
+		
+		transform.position = startPosition;
+
+		health = 100;
+		healthText.text = $"{health}/100";
+
+		Cursor.visible = true;
+        Screen.lockCursor = true;
 	}
 }
