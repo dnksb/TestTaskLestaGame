@@ -27,6 +27,9 @@ public class WovenKidExample : MonoBehaviour {
 
 	public DateTime StartTime;
 
+	public bool inWindZone;
+	public GameObject windZone;
+
 	void Start () {
 		anim = GetComponent<Animator> ();
 		Idle = Animator.StringToHash("Idle");
@@ -73,19 +76,21 @@ public class WovenKidExample : MonoBehaviour {
 
             controller.position += (move.normalized * Force * Time.deltaTime);
         }
+		controller.position -= inWindZone ? (windZone.GetComponent<FanController>().direction * windZone.GetComponent<FanController>().strength) * Time.deltaTime : Vector3.zero;
 	}
 
 	public void Hit()
 	{
 		health -= 20;
-		healthText.text = $"{health}/100";
 		if(health <= 0)
 		{
 			loseMenu.SetActive(true);
+			GetComponent<WovenKidExample>().enabled = false;
+
 			Cursor.visible = false;
-			Screen.lockCursor = false;
-			healthText.text = $"{health}/100";
+			Screen.lockCursor = false;			
 		}
+		healthText.text = $"{health}/100";
 	}
 
 	public void OnTriggerEnter(Collider other)
@@ -98,9 +103,26 @@ public class WovenKidExample : MonoBehaviour {
 		{
 			var ts = DateTime.Now - StartTime;
 			winText.text = "Победа!\nвремя: " + Math.Floor(ts.TotalSeconds).ToString() + "с";
+			
 			winMenu.SetActive(true);
+			GetComponent<WovenKidExample>().enabled = false;
+
 			Cursor.visible = false;
             Screen.lockCursor = false;
+		}
+		if(other.tag == "windArea")
+		{
+			windZone = other.gameObject;
+			inWindZone = true;
+		}
+	}
+
+	public void OnTriggerExit(Collider other)
+	{
+		if(other.tag == "windArea")
+		{
+			inWindZone = false;
+			windZone = null;
 		}
 	}
 
@@ -108,6 +130,7 @@ public class WovenKidExample : MonoBehaviour {
 	{
 		loseMenu.SetActive(false);
 		winMenu.SetActive(false);
+		GetComponent<WovenKidExample>().enabled = true;
 
 		transform.position = startPosition;
 

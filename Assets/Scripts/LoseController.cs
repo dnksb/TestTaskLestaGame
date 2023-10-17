@@ -13,6 +13,7 @@ public class LoseController : MonoBehaviour
             loseMenu.SetActive(true);
             Cursor.visible = false;
             Screen.lockCursor = false;
+            other.GetComponent<WovenKidExample>().enabled = false;
         }
     }
 }
