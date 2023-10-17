@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -18,12 +19,14 @@ public class WovenKidExample : MonoBehaviour {
 	
 	int health;
 	public Text healthText;
+	public Text winText;
 	
 	public Vector3 startPosition;
 	public GameObject loseMenu;
 	public GameObject winMenu;
 
-	// Use this for initialization
+	public DateTime StartTime;
+
 	void Start () {
 		anim = GetComponent<Animator> ();
 		Idle = Animator.StringToHash("Idle");
@@ -37,9 +40,10 @@ public class WovenKidExample : MonoBehaviour {
 
 		Cursor.visible = true;
         Screen.lockCursor = true;
+
+		StartTime = DateTime.Now;
 	}
 
-	// Update is called once per frame
 	void Update () {
 		float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
@@ -71,23 +75,32 @@ public class WovenKidExample : MonoBehaviour {
         }
 	}
 
+	public void Hit()
+	{
+		health -= 20;
+		healthText.text = $"{health}/100";
+		if(health <= 0)
+		{
+			loseMenu.SetActive(true);
+			Cursor.visible = false;
+			Screen.lockCursor = false;
+			healthText.text = $"{health}/100";
+		}
+	}
+
 	public void OnTriggerEnter(Collider other)
 	{
 		if(other.tag == "fire")
 		{
-			health -= 20;
-			healthText.text = $"{health}/100";
-			if(health <= 0)
-			{
-				loseMenu.SetActive(true);
-				Cursor.visible = false;
-				Screen.lockCursor = false;
-				healthText.text = $"{health}/100";
-			}
+			Hit();
 		}
-		else if(other.tag == "finish")
+		else if(other.tag == "Finish")
 		{
+			var ts = DateTime.Now - StartTime;
+			winText.text = "Победа!\nвремя: " + Math.Floor(ts.TotalSeconds).ToString() + "с";
 			winMenu.SetActive(true);
+			Cursor.visible = false;
+            Screen.lockCursor = false;
 		}
 	}
 
@@ -95,7 +108,7 @@ public class WovenKidExample : MonoBehaviour {
 	{
 		loseMenu.SetActive(false);
 		winMenu.SetActive(false);
-		
+
 		transform.position = startPosition;
 
 		health = 100;
@@ -103,5 +116,6 @@ public class WovenKidExample : MonoBehaviour {
 
 		Cursor.visible = true;
         Screen.lockCursor = true;
+		StartTime = DateTime.Now;
 	}
 }
